@@ -1,0 +1,39 @@
+---
+title: 'Sprint 1: Spreadsheet Generation'
+date: '2024-05-25'
+tags: ['internship', 'webdev', 'react', 'google']
+---
+Last week, Taylor and I had our next standup meeting to discuss the next steps for the Idaho Foreclosures website. Currently, my task is to provide the core functionality of the website--show the customers a list of foreclosures. There are a lot of moving parts surrounding this, so I'm going to do my best to break down how I've begun tackling the problem, and what I think is next for me to complete this week before my next standup meeting with Taylor.
+
+### Part 1: Getting The Actual Data
+The actual data for all of the foreclosures is stored in a spreadsheet. To render the text on a webpage, this data needs to be in a format recognizeable to the webapp. Since we're working in `Next.js`, this makes things extremely easy. Using a `JSON` format will work best here, as it is native to the language and is highly flexible. To get a nice JSON file, I needed to do a few things:
+
+1. Find a way to actually parse the spreadsheet,
+2. Organize the data in the JSON file into a suitable heirarchy for use on the website,
+3. Export all the contents of this output into a JSON file which can be obtained by the webapp later. 
+
+Fetching the sheet data was relatively light work. Most of the heavy lifting is done using a Google Apps Script file which has prebuilt functions to recognize the range of the spreadsheet. From there, I used a simple algorithm the loop over the sheet data:
+```
+  // The first line of the spreadsheet contains the headers. 
+  var headers = data[0]; 
+  
+  // Then, we loop through the rows of data to construct our data objects.
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    var jsonObject = {};
+    
+    for (var j = 0; j < row.length; j++) {
+      jsonObject[headers[j]] = row[j];
+    }
+
+    // When we finish a row, we push it to the file as one object in the list.
+    jsonArray.push(jsonObject); 
+  }
+```
+The last portion of the file creates a file named `data.json` which contains our JSON file. We have completed the first half of the problem, which is getting the actual data. This is where I stopped working today.
+
+### Part 2: Showing Said Actual Data
+Tomorrow, I will begin creating a table to organize all the data in the spreadsheet to be viewable on the website. I will be using the Table component from the `shadcn-ui` components list. Then, I will create another simple algorithm to loop through the JSON file and populate the table with components for each JSON object. Once the data can be displayed on the web page, I will need to use Tailwind to make the table easy to read for different, such as a phone or tablet. 
+
+### Closing thoughts
+For some reason I was dreading working on this project today, but it turned out I had a lot of fun once I just got started. I think schoolwork has unintentionally Pavlov'd me into dreading doing any type of work that has a deadline, which I'm not particularly fond of. Today's experience generating a JSON file was relatively fun experience, as most of this internship experience has been for me. I look forward to picking up where I left off on this project tomorrow. 
