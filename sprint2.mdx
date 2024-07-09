@@ -1,0 +1,69 @@
+---
+title: 'Sprint 2: Table Population and Best Practices'
+date: '2024-07-08'
+tags: ['internship', 'webdev', 'react', 'ui', 'ux']
+---
+Today, I updated the already-existing data table to look more visually appealing from a UI/UX standpoint. Through the use of asynchronous functions and clever use of components and formatting, I transformed a spreadsheet of data into the groundwork for an enticing, easy to digest user experience.
+
+Starting with the table. The table uses a `shadcn-ui` componenet called a Table which can have headers, rows, and individual cells. I used a JSON file to populate this cell with a `map()` function:
+
+```
+data.map((item, index) => ( // map data to cells from JSON
+   <TableRow key={index}>
+      <TableCell>{item["Status"]}</TableCell>
+      <TableCell>{item["Name"]}</TableCell>
+      <TableCell>{item["House #"]}</TableCell>
+      // ... and so on
+   </TableRow>
+))
+```
+In JavaScript, asynchronous functions can be used to load information onto the page before the expected data is loaded. This is called a promise, where the eventual data is "promised" to the website. In this case, the promise lies in the JSON file that will be filled out in the table. 
+
+However, there will be a moment in time where the user will be on the webpage, but the data has not yet been properly fetched. The user needs to understand from the web page that data is coming; this will make the user less frustrated as the website works its magic. In simpler terms, just let the page load. 
+
+But while a page loads, you still want your website to look pretty. Many websites use progress bars or throbbers, but I opted for a skeleton, which represents the elements of a page in greyed-out, wire-framed boxes that will eventually be hydrated with data. 
+
+In my table component, I created a "loading" state which recognizes if the data has been loaded or not.
+```
+const [loading, setLoading] = useState(true);
+```
+In the asynchronous function which calls the data, this value is set:
+```
+useEffect(() => {
+   const fetchData = async () => {
+      try { // this is the expected call the function makes
+         const response = await fetch('/data.json');
+         const data = await response.json();
+         setData(data); // populate the page
+      } catch (error) { // if something goes wrong, say:
+         console.error('There was a problem with the fetch operation:', error);
+      } finally { // once data is loaded
+         setLoading(false); 
+      }
+   };
+
+   fetchData();
+}, []);
+```
+Now that we have this data tied to a loading variable, I can put a ternary operator in the component's default export which will dynamically replace the greyed skeleton with the correct data.
+```
+<TableBody>
+   {loading ? ( // check if the data has been loaded
+      // Map empty rows with loading skeletons
+   ) : (
+      data.map((item, index) => ( 
+         // map data to cells from JSON
+      ))
+   )}
+</TableBody>
+```
+
+Another thing I wanted to focus on in this dev blog was the importance of adhering to best practices and sticking to a specific workflow. 
+
+Over the last few weeks, I found myself wanting to make quick changes in the repository, but those changes were not necessarily in line with the task I was checking out in the repository. 
+
+This lead to a "crossing of streams," so to speak, where commits would have extra changes to them that would not be known about if anyone else other than myself were to interact with them. 
+
+In order to keep my commits clean an on task, I went back and identified the extra changes that were irrelevant to the commit, created individual tasks to represent those changes. In the current workflow we are using, we create user stories which are split up into tasks. Each task should be on its own branch in the repo, which will eventually be merged into the master branch. When a task is finished, we can mark it as completed. 
+
+In practice, this particular workflow is extremely useful for maintaining a clean codebase, and also making the repository easy to understand should someone else need to inherit the codebase. In the future, I will dedicate some time specifically to making the repository less convoluted for outsiders to read. I believe this is an important software engineering skill, since explaining your work to others is paramount in a team environment such as this project.
